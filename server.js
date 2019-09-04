@@ -6,7 +6,6 @@
 const Koa = require('koa')
 const { koaDevMiddleware, koaHotMiddleware } = require('./hmr')
 const serve = require('koa-static');
-let devMiddleware;
 
 
 // Core module - allows us to obtain absolute paths.
@@ -112,14 +111,14 @@ if (isProduction) {
 
   // Ordering here is important! Make sure that the dev middleware has a chance to clobber
   // the Koa filesystem before hot middleware starts reading from it.
-  devMiddleware = koaDevMiddleware(webCompiler, {
-    noInfo: true,
+  const devMiddleware = koaDevMiddleware(webCompiler, {
+    noInfo: true
   })
 
   app.use(devMiddleware)
   app.use(koaHotMiddleware(webCompiler, {
     path: '/__webpack_hmr',
-    heartbeat: 10 * 1000,
+    heartbeat: 10 * 1000
   }))
 
   // This one's fun. So if you've followed along above you know that webpack-dev-middleware
@@ -166,7 +165,6 @@ if (isProduction) {
       console.groupEnd()
 
       renderer = generateRenderer(devMiddleware.fileSystem)
-      // console.log(devMiddleware.fileSystem)
       console.timeEnd('\nCompilation Time')
     })
   })
@@ -200,9 +198,10 @@ app.use(async (ctx, next) => {
   // which (since we're on the server) gets passed directly to `entry-server.js`. If the Vue
   // app isn't able to find a matching route, it will pass back an error.
   try {
-    ctx.body = await renderer.renderToString({ url: ctx.url })
+    ctx.body = await renderer.renderToString({ url: ctx.request.url })
   } catch (err) {
-    ctx.body = await devMiddleware.fileSystem.readFileSync(__dirname + ctx.url)
+    ctx.status = 404
+    ctx.body = 'Could not find page...'
   }
 })
 

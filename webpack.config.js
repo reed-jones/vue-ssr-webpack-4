@@ -35,8 +35,7 @@ const VueSSRServerPlugin = require('vue-server-renderer/server-plugin')
 // Convenience Utils
 // ******************************
 
-const env = process.env.NODE_ENV
-const isProduction = env === 'production'
+const isProduction = process.env.NODE_ENV === 'production'
 
 // ******************************
 // Base Webpack Configuration
