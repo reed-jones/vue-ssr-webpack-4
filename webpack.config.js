@@ -91,7 +91,7 @@ const base = {
   },
   output: {
     path: Path.resolve(__dirname, './public'),
-    publicPath: '/public/',
+    publicPath: '/',
     filename: "[name].[hash:8].js"
   },
   plugins: [
