@@ -3,40 +3,19 @@
 // ******************************
 
 // Core module - allows us to obtain absolute paths.
-const Path = require('path')
+import Path from 'path'
 
 // Supported by Vue Loader 15 and, unlike ExtractTextPlugin, works with Webpack 4 seamlessly.
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 
 // Allows Webpack to parse *.vue files. Note the new import signature.
-const { VueLoaderPlugin } = require('vue-loader')
-
-// Takes our *.vue files and other web assets and bundles them.
-const Webpack = require('webpack')
-
-// Allows us to intelligently merge Webpack configuration objects.
-const WebpackMerge = require('webpack-merge')
-
-// Allows us to exclude Node.js dependencies from the built server bundle, making build times
-// much, much faster.
-const WebpackNodeExternals = require('webpack-node-externals')
-
-// The Vue SSR client plugin generates a `client-manifest` which allows Vue to make better decisions
-// about how and what to render client-side, but TBH it's all a mystery to me.
-const VueSSRClientPlugin = require('vue-server-renderer/client-plugin')
-
-// Beyond Webpack and Vue itself, this one of the most important dependencies. The Vue SSR server
-// plugin generates a `server-manifest` which is used instruct the rendering engine exactly what to
-// return when a web request is made. But again, the internals of this plugin are a mystery to me
-// as well.
-const VueSSRServerPlugin = require('vue-server-renderer/server-plugin')
+import { VueLoaderPlugin } from 'vue-loader'
 
 // ******************************
 // Convenience Utils
 // ******************************
 
-const env = process.env.NODE_ENV
-const isProduction = env === 'production'
+const isProduction = process.env.NODE_ENV === 'production'
 
 // ******************************
 // Base Webpack Configuration
@@ -44,10 +23,11 @@ const isProduction = env === 'production'
 
 // This configuration contains general properties relevant to both our server and client assets.
 // It's used by both of the configuration objects returned from this module.
-const base = {
+const baseConfig = {
   // This property is required as of Webpack 4. If it's not set, you'll catch heat.
   // Learn more: https://medium.com/webpack/webpack-4-mode-and-optimization-5423a6bc597a
   mode: isProduction ? 'production' : 'development',
+
   module: {
     rules: [{
       // As mentioned above, transforms *.vue components into their component elements.
@@ -75,10 +55,10 @@ const base = {
       use: isProduction ? [
         MiniCssExtractPlugin.loader,
         'css-loader'
-       ] : [
-        'vue-style-loader',
-        'css-loader'
-       ]
+      ] : [
+          'vue-style-loader',
+          'css-loader'
+        ]
     }, {
       // File loader simply takes a file a puts it somewhere else with (optionally a new name and
       // cache-busting hash).
@@ -89,78 +69,38 @@ const base = {
       }
     }]
   },
+
   output: {
-    path: Path.resolve(__dirname, './public'),
-    publicPath: '/public/',
+    path: Path.resolve(__dirname, '../public'),
+    publicPath: '/',
     filename: "[name].[hash:8].js"
   },
+
   plugins: [
     new VueLoaderPlugin()
   ],
+
   resolve: {
     alias: {
-      // Ensures that the ECMAScript module flavor of Vue is imported whenenver used.
+      // Ensures that the ECMAScript module flavor of Vue is imported whenever used.
       // Thus, in `import Vue from 'vue'`, `vue` is mapped to the path below.
       'vue$': 'vue/dist/vue.esm.js',
       // A simple convenience alias to avoid nasty relative paths.
       // Thus, `../../../components/Foo.vue` might become `@/components/Foo.vue`.
-      "@": Path.resolve(__dirname, './app')
+      "@": Path.resolve(__dirname, '../app')
     },
     // Allows Webpack to resolve *.vue files, which otherwise it wouldn't do.
     extensions: ['.js', '.vue']
-  }
+  },
 }
 
 if (isProduction) {
   // See the config of the CSS loader in the base config above for the reason this is added
   // in production.
-  base.plugins.unshift(new MiniCssExtractPlugin({
+  baseConfig.plugins.unshift(new MiniCssExtractPlugin({
     filename: '[name].[hash:8].css'
   }))
 }
 
-// ****************************************
-// Client-Side Webpack Configuration
-// ****************************************
 
-const web = WebpackMerge(base, {
-  target: 'web',
-  devtool: isProduction ? false : 'source-map',
-  entry: ['@/entry-web.js'],
-  plugins: [
-    new VueSSRClientPlugin()
-  ]
-})
-
-// In development, we want to instantly update the client if we make a change to the Vue app.
-// The webpack-hot-middleware plugin let's us do just that, and here we add the necessary elements
-// to the above `web` config if we're running in development mode.
-if (!isProduction) {
-  web.entry.unshift('webpack-hot-middleware/client?quiet=true&reload=true')
-  web.plugins.push(new Webpack.HotModuleReplacementPlugin())
-  web.plugins.push(new Webpack.NoEmitOnErrorsPlugin())
-}
-
-// ****************************************
-// Server-Side Webpack Configuration
-// ****************************************
-
-const server =  WebpackMerge(base, {
-  target: 'node',
-  entry: ["./app/entry-server.js"],
-  // Here we whitelist only those Node.js modules which are necessary for rendering our app.
-  // Including any other modules in the server bundle slows build time and is unneccessary.
-  externals: WebpackNodeExternals({
-    whitelist: ['isomorphic-fetch', 'vue', 'vue-router', 'vuex']
-  }),
-  output: {
-    // Result in the compiled module being exposed as `module.exports = ...`.
-    // See https://webpack.js.org/configuration/output/#module-definition-systems
-    libraryTarget: 'commonjs2'
-  },
-  plugins: [
-    new VueSSRServerPlugin()
-  ]
-})
-
-module.exports = [server, web]
+export default baseConfig

@@ -1,0 +1,6 @@
+{
+    "exec": "yarn serve:dev",
+    "watch": ["server.js","hmr.js", "build/*"],
+    "ignore": ["__tests__/*"],
+    "ext": "js, html, json"
+  }
