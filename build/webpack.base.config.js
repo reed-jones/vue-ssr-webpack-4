@@ -34,6 +34,9 @@ const baseConfig = {
       test: /\.vue$/,
       loader: 'vue-loader'
     }, {
+      test: /\.pug$/,
+      loader: 'pug-plain-loader'
+    }, {
       // Per goal #1 above, I wanted to be able to extract my CSS file separately. The prescribed
       // means of doing this (in Vue Loader 14) is via the ExtractTextWebpackPlugin:
       // (https://vue-loader.vuejs.org/en/configurations/extract-css.html)
@@ -51,13 +54,45 @@ const baseConfig = {
       // community? The core issue is that the former is isomorphic while the latter isn't, meaning
       // that if we try to use `style-loader` on the server then we get mysterious errors, such as
       // `window is not defined`.  Read more here: https://github.com/vuejs/vue-style-loader.
-      test: /\.css$/,
-      use: isProduction ? [
+      test: /\.scss$/,
+      oneOf: isProduction ? [
         MiniCssExtractPlugin.loader,
-        'css-loader'
+        {
+          loader: 'css-loader',
+          options: {
+            // enable CSS Modules
+            modules: {
+              // customize generated class names
+              localIdentName: '[local]_[hash:base64:8]'
+            },
+          }
+        },
+        'sass-loader'
       ] : [
-          'vue-style-loader',
-          'css-loader'
+          // this matches `<style module>`
+          {
+            resourceQuery: /module/,
+            use: [
+              'vue-style-loader',
+              {
+                loader: 'css-loader',
+                options: {
+                  modules: {
+                    localIdentName: '[local]_[hash:base64:5]'
+                  },
+                }
+              },
+              'sass-loader'
+            ]
+          },
+          // this matches plain `<style>` or `<style scoped>`
+          {
+            use: [
+              'vue-style-loader',
+              'css-loader',
+              'sass-loader'
+            ]
+          }
         ]
     }, {
       // File loader simply takes a file a puts it somewhere else with (optionally a new name and

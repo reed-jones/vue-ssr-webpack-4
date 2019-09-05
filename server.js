@@ -205,7 +205,7 @@ app.use(async (ctx, next) => {
   // In development, the renderer might take a second to generate.
   if (!renderer) {
     ctx.status = 500
-    ctx.body = 'Renderer is being created, one moment....'
+    ctx.body = 'Renderer is being created, one moment please....'
     return
   }
 

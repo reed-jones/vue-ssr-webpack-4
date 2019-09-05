@@ -1,15 +1,12 @@
-<template>
-  <div class="container">
-    <h1>Fact about the number: {{ $route.params.number }}</h1>
-    <p v-if="fact">{{ fact }}</p>
-    <p v-if="!fact">Loading fact...</p>
-    <router-link :to="{ name: 'Number', params: { number: Math.floor(Math.random() * 100) } }">
-      How about another?
-    </router-link>
-    <div>
-      <router-link :to="{ name: 'Home' }">Go home...</router-link>
-    </div>
-  </div>
+<template lang="pug">
+.container
+    h1 Fact about the number: {{ $route.params.number }}
+    p(v-if="fact") {{ fact }}
+    p(v-if="!fact") Loading fact...
+    RouterLink(:to="{ name: 'Number', params: { number: Math.floor(Math.random() * 100) } }")
+      | How about another?
+    div
+      RouterLink(:to="{ name: 'Home' }") Go home...
 </template>
 
 <script>

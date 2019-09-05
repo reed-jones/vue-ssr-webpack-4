@@ -1,16 +1,12 @@
-<template>
-<div class="container">
-  <h1>{{ message }}</h1>
-  <img src="~@/assets/reindeer-power.gif" width="200" />
-  <div>
-    <router-link :to="{name: 'Name', params: { name: 'foo' }}">Go to Name Page</router-link>
-  </div>
-  <div>
-    <router-link :to="{ name: 'Number', params: { number: 1 } }">
-      Learn about the number 1!
-    </router-link>
-  </div>
-</div>
+<template lang="pug">
+.container
+  h1 {{ message }}
+  img(src="~@/assets/reindeer-power.gif" width="200")
+  div
+    RouterLink(:to="{name: 'Name', params: { name: 'foo' }}") Go to Name Page
+  div
+    RouterLink(:to="{ name: 'Number', params: { number: 1 } }")
+      | Learn about the number 1!
 </template>
 
 <script>
