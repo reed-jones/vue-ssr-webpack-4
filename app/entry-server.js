@@ -1,27 +1,32 @@
-import { createApp } from "@/bootstrap";
+import { createApp } from "@/app";
 
 export default async context => {
-  const { url } = context
-  const { app, router, store } = createApp()
+  return new Promise((resolve, reject) => {
+    const { app, router, store } = createApp()
 
-  router.push(url)
+    // set server-side router's location
+    router.push(context.url)
 
-  await new Promise((resolve, reject) => router.onReady(resolve, reject))
+    // wait until router has resolved possible async components and hooks
+    router.onReady(() => {
+      const matchedComponents = router.getMatchedComponents()
 
-  const matchedComponents = router.getMatchedComponents()
+      // no matched routes, reject with 404
+      if (!matchedComponents.length) {
+        return reject({ code: 404 })
+      }
 
-  if (!matchedComponents.length) { throw new Error('404') }
+      context.rendered = () => {
+        // After the app is rendered, our store is now
+        // filled with the state from our components.
+        // When we attach the state to the context, and the `template` option
+        // is used for the renderer, the state will automatically be
+        // serialized and injected into the HTML as `window.__INITIAL_STATE__`.
+        context.state = store.state
+      }
 
-  await Promise.all(matchedComponents.map(component => {
-    if (component.asyncData) {
-      return component.asyncData({
-        store,
-        route: router.currentRoute
-      })
-    }
-  }))
-
-  context.state = store.state
-
-  return app
+      // the Promise should resolve to the app instance so it can be rendered
+      resolve(app)
+    }, reject)
+  })
 }

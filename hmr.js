@@ -1,8 +1,8 @@
-const webpackDevMiddleware = require("webpack-dev-middleware")
-const webpackHotMiddleware = require("webpack-hot-middleware")
-const { PassThrough } = require('stream')
+import webpackDevMiddleware from 'webpack-dev-middleware'
+import webpackHotMiddleware from 'webpack-hot-middleware'
+import { PassThrough } from 'stream'
 
-exports.koaDevMiddleware = (webpackCompiler, options) => {
+export const koaDevMiddleware = (webpackCompiler, options) => {
     const expressStyled = webpackDevMiddleware(webpackCompiler, options)
     const koaStyled = async (ctx, next) => {
         await expressStyled(ctx.req, {
@@ -15,6 +15,7 @@ exports.koaDevMiddleware = (webpackCompiler, options) => {
             locals: ctx.state,
         }, next)
     }
+
     koaStyled.fileSystem = expressStyled.fileSystem
     koaStyled.close = expressStyled.close
     koaStyled.invalidate = expressStyled.invalidate
@@ -22,7 +23,7 @@ exports.koaDevMiddleware = (webpackCompiler, options) => {
     return koaStyled
 }
 
-exports.koaHotMiddleware = (webpackCompiler, options) => {
+export const koaHotMiddleware = (webpackCompiler, options) => {
     const expressStyled = webpackHotMiddleware(webpackCompiler, options);
     return async (ctx, next) => {
         const stream = new PassThrough()
