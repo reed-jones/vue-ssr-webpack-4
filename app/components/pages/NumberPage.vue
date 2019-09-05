@@ -2,7 +2,7 @@
 .container
     h1 Fact about the number: {{ $route.params.number }}
     p(v-if="fact") {{ fact }}
-    p(v-if="!fact") Loading fact...
+    p(v-else) Loading fact...
     RouterLink(:to="{ name: 'Number', params: { number: Math.floor(Math.random() * 100) } }")
       | How about another?
     div
