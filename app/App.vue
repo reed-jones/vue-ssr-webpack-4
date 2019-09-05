@@ -1,29 +1,32 @@
-<template>
-  <div id="app">
-    <router-view />
-  </div>
+<template lang="pug">
+  #app
+    RouterView
 </template>
 
-<style>
-h1, p, a {
-  color: palevioletred;
-}
+<style lang="scss" module>
+:global {
 
-.container {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background-color: papayawhip;
-  text-align: center;
-}
+  h1, p, a {
+    color: palevioletred;
+  }
 
-h1 {
-  margin-bottom: 20px;
+
+  h1 {
+    margin-bottom: 20px;
+  }
+
+  .container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: papayawhip;
+    text-align: center;
+  }
 }
 </style>
