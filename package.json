@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "nodemon",
-    "build": "NODE_ENV=production webpack",
+    "build:client": "NODE_ENV=production node -r esm ./node_modules/.bin/webpack --config=build/webpack.client.config.js",
+    "build:server": "NODE_ENV=production node -r esm ./node_modules/.bin/webpack --config=build/webpack.server.config.js",
     "serve:prod": "NODE_ENV=production node index.js",
     "serve:dev": "NODE_ENV=development node -r esm server.js"
   },
