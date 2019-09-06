@@ -55,45 +55,52 @@ const baseConfig = {
       // that if we try to use `style-loader` on the server then we get mysterious errors, such as
       // `window is not defined`.  Read more here: https://github.com/vuejs/vue-style-loader.
       test: /\.scss$/,
-      oneOf: isProduction ? [
-        MiniCssExtractPlugin.loader,
-        {
-          loader: 'css-loader',
-          options: {
-            // enable CSS Modules
-            modules: {
-              // customize generated class names
-              localIdentName: '[local]_[hash:base64:8]'
-            },
-          }
-        },
-        'sass-loader'
-      ] : [
-          // this matches `<style module>`
+      oneOf: isProduction ? [{
+        resourceQuery: /module/,
+        use: [
+          // extract to external stylesheet
+          MiniCssExtractPlugin.loader,
           {
-            resourceQuery: /module/,
-            use: [
-              'vue-style-loader',
-              {
-                loader: 'css-loader',
-                options: {
-                  modules: {
-                    localIdentName: '[local]_[hash:base64:5]'
-                  },
-                }
+            loader: 'css-loader',
+            options: {
+              // enable CSS Modules
+              modules: {
+                // customize generated class names
+                localIdentName: '[local]_[hash:base64:8]'
               },
-              'sass-loader'
-            ]
+            }
           },
-          // this matches plain `<style>` or `<style scoped>`
-          {
-            use: [
-              'vue-style-loader',
-              'css-loader',
-              'sass-loader'
-            ]
-          }
+          'sass-loader'
         ]
+      }, {
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          'sass-loader'
+        ]
+      }] : [{
+        // this matches `<style module>`
+        resourceQuery: /module/,
+        use: [
+          'vue-style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              modules: {
+                localIdentName: '[local]_[hash:base64:5]'
+              }
+            }
+          },
+          'sass-loader'
+        ]
+      }, {
+        // this matches plain `<style>` or `<style scoped>`
+        use: [
+          'vue-style-loader',
+          'css-loader',
+          'sass-loader'
+        ]
+      }]
     }, {
       // File loader simply takes a file a puts it somewhere else with (optionally a new name and
       // cache-busting hash).
